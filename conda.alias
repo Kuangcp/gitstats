@@ -1,0 +1,29 @@
+___gs_log(){
+    # 从zsh末尾复制而来，注意会随conda版本变化
+    __conda_setup="$('$HOME/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+            . "$HOME/miniconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="$HOME/miniconda3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+
+    cur=$(pwd)
+    root=$(git rev-parse --show-toplevel)
+    if [ "$root"z = 'z' ]; then 
+        return;
+    fi
+    cd $root
+    # 按需考虑直接安装python2运行环境，或者使用conda进行隔离安装
+    conda activate py2
+    gitstats . git-report
+    cd "$cur"
+    conda deactivate
+    # 退出默认的base
+    conda deactivate
+}
+alias gs.log='___gs_log'
